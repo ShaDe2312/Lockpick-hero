@@ -17,11 +17,15 @@
 #define ACCELERATION_DAMPENER   0.3f 
 #define DEFAULT_BREAK_ANGLE_SIZE    30.0f
 
-
 int main()
 {
     InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "LockpickHero");  
     SetTargetFPS(60);
+
+    InitAudioDevice();
+    Music bgm = LoadMusicStream("./resources/pink_panther_theme.mp3");
+    PlayMusicStream(bgm);
+    bool muteBgm = false;
 
     const float LockRadius = (MIN(SCREEN_WIDTH,SCREEN_HEIGHT)/2) * 0.8f;
     /* X&Y coordinates of origin of both lock & pick is same*/
@@ -78,6 +82,15 @@ int main()
         
         CurrentPickAngle += AngularVelocity;
 
+        if(IsKeyPressed(KEY_M)) {
+            muteBgm = !muteBgm;
+            if(IsMusicStreamPlaying(bgm))
+                PauseMusicStream(bgm);
+            else
+                PlayMusicStream(bgm);
+        }
+        UpdateMusicStream(bgm);
+
         /* Normalising startAngle, keeping less than 360. */
         CurrentPickAngle = fmodf(CurrentPickAngle, 360.0f);
         if(CurrentPickAngle < 0.0f)
@@ -104,6 +117,9 @@ int main()
             PICK_SECTOR_SEGMENTS, GREEN);
         EndDrawing();
     }
+
+    UnloadMusicStream(bgm);
+    CloseAudioDevice();
 
     CloseWindow();
     return 0;
